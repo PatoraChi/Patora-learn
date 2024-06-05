@@ -2,30 +2,31 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+//klarifikasi dulu modul ini masih belom 100% paham juga jadi kaloa ada salah ya maap wkwkwk XD, sama kemungkinan dikit ada penjelasan/karena dikit aja pahamnya
 
 int maxmsg = 1;
 int totalBits = 0;
 // P note akan memandu menjelaskan program "sebisanya"
 void checkmessage(const char *filename, const char *message) {
-    FILE *fp = fopen(filename, "rb");
+    FILE *fp = fopen(filename, "rb");// fopen mode rb itu sama kayak mode r tapi versi binner
     if (fp == NULL) {
         printf("Error: Tidak dapat membuka file %s\n", filename);
         return;
     }
 
     uint32_t width, height;
-    fseek(fp, 18, SEEK_SET); // Pindah ke posisi lebar (offset 18), berisi width(translate sendiri) 
-    fread(&width, sizeof(uint32_t), 1, fp); //menulis panjang(mungkin) gambar
+    fseek(fp, 18, SEEK_SET); // Pindah ke posisi lebar (offset 18), berisi width(translate sendiri) , kenapa 18? liat aja format nya di https://en.wikipedia.org/wiki/BMP_file_format
+    fread(&width, sizeof(uint32_t), 1, fp); //menulis panjang(mungkin) gambar, size of unit32_t itu artinya sebesar 4bit, karena unit32_t itu besarnya 4bit, kalo 1 itu kita menulisnya sebanyak 1 aja
     fread(&height, sizeof(uint32_t), 1, fp);//menulis lebar(mungkin) gambar
 
     maxmsg = width * height * 3;//dikasi 3 karena 1 pixel berisi 3 warna yaitu RGB, jadi 1 pixel bisa memuat 3 bit
-
+//jadi kenpa 1pixel cuma bisa 3? karena kita pake LSB kalo ga salah namanya, artinya cuma menggunakan bit paling akhir di bagian pixel warna
+//1 warna itu ada 255 ya, 11111111, jadi kita cuma make 1 paling kanan aja sisanya ga diapa apain
     fclose(fp);
 
-    const char *endMarker = "<end>";
+    const char *endMarker = "<end>";// end marker untuk penanda kalo pesan dah berakhir nnti tau dah fungsinya
     int markerLength = strlen(endMarker);
-    totalBits = (strlen(message) + markerLength) * 8;
+    totalBits = (strlen(message) + markerLength) * 8;//kenapa dikali 8? karena 1 karakter aschii itu ada 8bit ya, ceka aj aschi table untuk selengkapnya
 
     
     if (maxmsg < totalBits) {// kayaknya mustahil ini true, karena panjang banget wkwkwk
@@ -36,41 +37,43 @@ void checkmessage(const char *filename, const char *message) {
 }
 
 void embedMessage(const char *inputFilename, const char *outputFilename, const char *message) {
-    FILE *inputFile = fopen(inputFilename, "rb");
+    FILE *inputFile = fopen(inputFilename, "rb"); //fopen mode rb itu sama kayak mode r tapi versi binner
     if (inputFile == NULL) {
         printf("Error: Tidak dapat membuka file %s\n", inputFilename);
         return;
     }
 
-    FILE *outputFile = fopen(outputFilename, "wb");
+    FILE *outputFile = fopen(outputFilename, "wb");//fopen mode wb itu sama kayak mode w tapi versi binner
     if (outputFile == NULL) {
         printf("Error: Tidak dapat membuat file %s\n", outputFilename);
         fclose(inputFile);
         return;
     }
 
-    fseek(inputFile, 0, SEEK_END);//keliling untuk membaca ukuran file gambar dalam ukuran byte
+    fseek(inputFile, 0, SEEK_END);//keliling untuk membaca ukuran file gambar dalam ukuran byte, misal filenya 8mb, itung dah tu brp byte
     long fileSize = ftell(inputFile);//ditulis disini
     fseek(inputFile, 0, SEEK_SET);//balek ke awal
 
-    unsigned char *fileBuffer = (unsigned char*)malloc(fileSize);
+    unsigned char *fileBuffer = (unsigned char*)malloc(fileSize);//menyiapkan filebuffer dengan ukuran sebesar filenya
     fread(fileBuffer, 1, fileSize, inputFile);//pointer filebuffer menunjuk ke bagian tempat ukuran filegambar "MUNGKIN" offser = 0 XD
     fclose(inputFile);
 	
     unsigned char *pixelData = fileBuffer + 54; // pointer ini menunjuk ke awal bit pixel, karena 54 untuk header, jadi +54 untuk melwatkan header
 
     const char *endMarker = "<end>";
-    char *fullMessage = (char*)malloc(strlen(message) + strlen(endMarker) + 1);
+    char *fullMessage = (char*)malloc(strlen(message) + strlen(endMarker) + 1);//kenapa + 1? kemungkinan jaga jaga biar ga abis abis banget, inget lebih baik lebih dari pada kurang
 
-    strcpy(fullMessage, message);
-    strcat(fullMessage, endMarker);
+    strcpy(fullMessage, message);//menulis message yg dimasukan user ke fullmessage
+    strcat(fullMessage, endMarker);//menambahkan endmarker (<end>) ke fullmessage
 
-    int messageIndex = 0;
+    int messageIndex = 0;//index dari 0
     int bitIndex = 7;//kenapa 7? karena dari 0, jadi 1 karakter ada 8bit
     int fullMessageLength = strlen(fullMessage);
 
     for (int i = 0; i < totalBits; i++) {
         if (fullMessage[messageIndex] & (1 << bitIndex)) { // "<<" artinya menggeser "1" kekanan kebanyak bitIndex, eh mungkin kiri
+//jadi maksud 1 digeger kekiri ini tu kykgini, 1 dalam binner itu kan 00000001, digeser sebanyak bit index, kalo diawal bit index itu 7 berarti digeser 7 kali jadi, 10000000
+//lalu akan di "and" kan dengan pesannya (berupa binnerjuga) misal pesannya "akira" index awal nya kan "a" di ubah ke binner jadi 1000001, nah si "a" ini di "and" dengan "1" yg dah digeser
             pixelData[i] |= 1; // apapun di or kan dengan 1 menghasilkan 1
         } else {
             pixelData[i] &= ~1; // apapun di and kan dengan 0 menghasilkan 0

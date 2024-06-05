@@ -3,7 +3,7 @@
 #include <string.h>
 #include <cmath>
 
-int hitung_sum(int data[], int panjang) {
+int hitung_sum(int data[], int panjang) {//membuat fungsi untuk sum "int data[], array untuk menyimpan angka yang dimasukan user) panjang dari mana? nanti liat di bagian sum ya
     int total = 0;
     for (int i = 0; i < panjang; ++i) {
         total += data[i];

@@ -6,7 +6,7 @@
 #define MAX_NIM_LENGTH 11 
 #define MAX_NAMA_LENGTH 100
 #define MAX_TAHUN_MASUK_LENGTH 5
-
+//Note : 
 
 struct Mahasiswa {
     char NIM[MAX_NIM_LENGTH];//kenapa 11?kan nim 10

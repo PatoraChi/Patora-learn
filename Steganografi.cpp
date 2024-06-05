@@ -73,14 +73,31 @@ void embedMessage(const char *inputFilename, const char *outputFilename, const c
     for (int i = 0; i < totalBits; i++) {
         if (fullMessage[messageIndex] & (1 << bitIndex)) { // "<<" artinya menggeser "1" kekanan kebanyak bitIndex, eh mungkin kiri
 //jadi maksud 1 digeger kekiri ini tu kykgini, 1 dalam binner itu kan 00000001, digeser sebanyak bit index, kalo diawal bit index itu 7 berarti digeser 7 kali jadi, 10000000
-//lalu akan di "and" kan dengan pesannya (berupa binnerjuga) misal pesannya "akira" index awal nya kan "a" di ubah ke binner jadi 1000001, nah si "a" ini di "and" dengan "1" yg dah digeser
-            pixelData[i] |= 1; // apapun di or kan dengan 1 menghasilkan 1
+//lalu akan di "and" kan dengan pesannya (berupa binnerjuga) misal pesannya "akira" index awal nya kan "a" di ubah ke binner jadi 01000001, nah si "a" ini di "and" dengan "1" yg dah digeser
+/*contoh ya a di "and" dengan 1, untuk yg pertama 1 digeser sebanyak 7 kali dari 00000001 menjadi 10000000 dan "a" itu 01000001 di asci tabel
+ jadi	01000001
+ 	10000000
+  ----------------- and
+  	00000000
+   lalu a digeser sebanyak 6 kali dari 00000001 menjadi 01000000
+   jadi	01000001
+ 	01000000
+  ----------------- and
+  	01000000
+    lalu a digeser sebanyak 5 kali dari 00000001 menjadi 00100000
+   jadi	01000001
+ 	00100000
+  ----------------- and
+  	00000000
+   dan seterusnya sebanyak 8 kali karena 1 karakter terdapat 8bit, nanti akan menhasilkan 01000001
+*/
+		pixelData[i] |= 1; // apapun di or kan dengan 1 menghasilkan 1
         } else {
             pixelData[i] &= ~1; // apapun di and kan dengan 0 menghasilkan 0
         }
 
-        bitIndex--;
-        if (bitIndex < 0) {
+        bitIndex--;//sama dengan bitindex = bitindex - 1
+        if (bitIndex < 0) {//kalo bit index dah -1, karena dari awal kan 7 , terus dikurang 1, nah misal udah sampe -1, bit index jadi 7 lagi
             bitIndex = 7; 
             messageIndex++;
             if (messageIndex >= fullMessageLength) {
@@ -131,6 +148,14 @@ void extractMessage(const char *filename) {
             /*(>-<) kondisi pertama mengecek apakah message sudah cukup untuk di isi <end> 
             jika messageindex sudah lebih besar atau sama dengan endtag maka true
             kondisi kedua membandingkan message(5 karakter terakhir) dengan <end>
+
+     jadi endtag ini kan berupa "<end>" itu ada 5 karakter kenapa dikurang 1? karena index dari 0, misal message sekarang index 3 berarti 3 itu masih kurang dari 4, jadi ini tidak true
+     kalo bit index sekarang 4 ato lebih baru yg bagian "messageIndex >= (sizeof(endTag) - 1)" ini menjadi true
+     lalu untuk bagian "strncmp(message + messageIndex - (sizeof(endTag) - 1), endTag, sizeof(endTag) - 1)" kita mengambil 5 karakter terakhir dari message
+     atau mengambil 5 index dari belakang, misal message sekarng "patora" berarti 5 terakhir itu "atora" nah 5 karakter terakhir ini dibandingkan dengan endtag "<end>" jika sama maka true jika beda maka false
+     contoh kasus bener , message = "patora<end>" maka yang dibandingkan adalah <end> dengan <end>, sama kan? true gitu
+
+     message[messageIndex - (sizeof(endTag) - 1)] = '\0'; ini menghapus endtag nya biar dari message = "patora<end>", menjadi message = "patora"
 			*/
             if (messageIndex >= (sizeof(endTag) - 1) && 
                 strncmp(message + messageIndex - (sizeof(endTag) - 1), endTag, sizeof(endTag) - 1) == 0) {

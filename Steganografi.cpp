@@ -4,6 +4,12 @@
 #include <stdlib.h>
 //klarifikasi dulu modul ini masih belom 100% paham juga jadi kaloa ada salah ya maap wkwkwk XD, sama kemungkinan dikit ada penjelasan/karena dikit aja pahamnya
 
+/*
+cara menggunakan program ini, 
+1 siapkan file gambar berupa BMP
+bisa ubah jpg ke bmp di https://picflow.com/convert/jpg-to-bmp atau tempat lainnya
+2. tinggal run aja wkwkwk dah itu aja XD
+*/
 int maxmsg = 1;
 int totalBits = 0;
 // P note akan memandu menjelaskan program "sebisanya"

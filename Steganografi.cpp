@@ -95,31 +95,26 @@ void embedMessage(const char *inputFilename, const char *outputFilename, const c
     int fullMessageLength = strlen(fullMessage);
 
     for (int i = 0; i < totalBits; i++) {
-        if (fullMessage[messageIndex] & (1 << bitIndex)) { // "<<" artinya menggeser "1" kekanan kebanyak bitIndex, eh mungkin kiri
+        if (fullMessage[messageIndex] & (1 << bitIndex)) { //jika fullmassage ke 0 misalnya a atau 01000001, berarti index 0 nya itu |0|1000001, nah si index 0 ini di and kan dengan 1 yang digeser
+//1 digeser 7 kali menjadi 10000000, karena saat di and kan si index 0 dari a ini (|0|1000001), menjadi 0 (tetep 0 sih sebenernya), jadi pada kondisi if dia tidak true, jadi dilakukan lah yang elsenya atau  pixelData[i] &= ~1; 
+//contoh yang true jika a pada index 1 yaitu 0|1|000001, di and kan dengan 1 yg digeser 6kali (01000000), karena si index 1 ini saat di andkan dengan 010000000 nilai dia tetap menjadi 1, maka kondisi if menjadi true sehingga dilakukan yang pixelData[i] |= 1; 
+		pixelData[i] |= 1; // mengubah bit LSB pada pixel warna pada gambar menjadi 1
+        } else {
+            pixelData[i] &= ~1; // mengubah bit LSB pada pixel warna pada gambar menjadi 0
+        }
+// "<<" artinya menggeser "1" kekanan kebanyak bitIndex, eh mungkin kiri
 //jadi maksud 1 digeger kekiri ini tu kykgini, 1 dalam binner itu kan 00000001, digeser sebanyak bit index, kalo diawal bit index itu 7 berarti digeser 7 kali jadi, 10000000
 //lalu akan di "and" kan dengan pesannya (berupa binnerjuga) misal pesannya "akira" index awal nya kan "a" di ubah ke binner jadi 01000001, nah si "a" ini di "and" dengan "1" yg dah digeser
 /*contoh ya a di "and" dengan 1, untuk yg pertama 1 digeser sebanyak 7 kali dari 00000001 menjadi 10000000 dan "a" itu 01000001 di asci tabel
- jadi	01000001
- 	10000000
-  ----------------- and
-  	00000000
-   lalu a digeser sebanyak 6 kali dari 00000001 menjadi 01000000
-   jadi	01000001
- 	01000000
-  ----------------- and
-  	01000000
-    lalu a digeser sebanyak 5 kali dari 00000001 menjadi 00100000
-   jadi	01000001
- 	00100000
-  ----------------- and
-  	00000000
+ jadi	|0|1000001		 lalu a digeser sebanyak 6 kali dari 00000001 menjadi 01000000
+ 	|1|0000000		   jadi	0|1|000001
+  ----------------- and			0|1|000000
+  	|0|0000000			----------------- and
+ 					0|1|000000
+nilai yg di cek itu nilai yg didalam ||, yang lain tidak di cek
    dan seterusnya sebanyak 8 kali karena 1 karakter terdapat 8bit, nanti akan menhasilkan 01000001
+   
 */
-		pixelData[i] |= 1; // apapun di or kan dengan 1 menghasilkan 1
-        } else {
-            pixelData[i] &= ~1; // apapun di and kan dengan 0 menghasilkan 0
-        }
-
         bitIndex--;//sama dengan bitindex = bitindex - 1
         if (bitIndex < 0) {//kalo bit index dah -1, karena dari awal kan 7 , terus dikurang 1, nah misal udah sampe -1, bit index jadi 7 lagi
             bitIndex = 7; 

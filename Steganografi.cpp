@@ -3,16 +3,34 @@
 #include <stdint.h>
 #include <stdlib.h>
 //klarifikasi dulu modul ini masih belom 100% paham juga jadi kaloa ada salah ya maap wkwkwk XD, sama kemungkinan dikit ada penjelasan/karena dikit aja pahamnya
-
+//NOTE : Tolong baca baik baik jgn setengah2 kwkwkwk,kalau ada yg ga ngerti hubungi orang yang memberi kalian link ini
 /*
 cara menggunakan program ini, 
 1 siapkan file gambar berupa BMP
 bisa ubah jpg ke bmp di https://picflow.com/convert/jpg-to-bmp atau tempat lainnya
-2. tinggal run aja wkwkwk dah itu aja XD
+2. siapkan file berupa ".txt" , untuk membuat file ".txt", klik kanan pada folder, pilih new, pilih text document
+3. jadi 1 folder, jadi folder bersisi 1.program , 2.Gambar BMP, 3.File.txt
+4. jalankan program seperti biasa
+5. jangan lupa untuk menulis pesan apapun di file "txt"
 */
 int maxmsg = 1;
 int totalBits = 0;
-// P note akan memandu menjelaskan program "sebisanya"
+char message[1000];
+void bacatext(const char *filename) {//program untuk membaca file "txt"
+	
+	
+    FILE *fp = fopen(filename, "r");//membaca file "txt" dengan mode r(read) read itu baca ya cuma bahasa inggris gak percaya cek disini https://translate.google.com/?sl=en&tl=id&op=translate
+    if (fp == NULL) {//jika file tidak ada print yg dibawah ini, dan TIDAK MEMBUAT FILE, karena hanya mode w yang dapat membuat file
+        printf("File tidak ditemukan");
+    } else {
+        while (fgets(isi, sizeof(isi), fp) != NULL) {//menulis isi dari file "txt" ke dalam message
+            message[strcspn(message, "\n")] = 0;
+            
+        }
+    }
+    //printf("%s",message);
+    fclose(fp);
+}
 void checkmessage(const char *filename, const char *message) {
     FILE *fp = fopen(filename, "rb");// fopen mode rb itu sama kayak mode r tapi versi binner
     if (fp == NULL) {
@@ -197,6 +215,7 @@ void menu(){
 int main(){
     char message[1000];
     char filename[100];
+    char filetext[100];
 	char filehasil[100];
 	
 	int pilihan;
@@ -209,14 +228,14 @@ int main(){
 	
 	switch(pilihan) {
 		case 1:{
-			printf("Masukkan nama file gambar BMP: ");
+		    printf("Masukkan nama file gambar BMP: ");
 		    scanf("%s", filename);
 		    getchar(); 
-		
-		    printf("Masukkan pesan: ");
-		    fgets(message, sizeof(message), stdin);
-		    message[strcspn(message, "\n")] = 0;
-		
+		    printf("Masukkan nama file text: ");
+		    scanf("%s", filetext);
+		    getchar(); 
+		    
+		    bacatext(filetext);
 		    checkmessage(filename, message);
 			printf("Masukkan nama file hasil gambar BMP: ");
 		    scanf("%s", filehasil);

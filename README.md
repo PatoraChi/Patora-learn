@@ -8,3 +8,7 @@ Note : Jika ada kesalahan dalam penjelasan/program , tolong dimaklumi karena say
 
 
 Note : Program Dibuat dengan bantuan ai 99% 
+
+
+
+Note : kalo mau penjelasan via zoom bisa chat wa di 08124x83xxx0

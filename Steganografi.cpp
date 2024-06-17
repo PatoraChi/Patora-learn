@@ -23,9 +23,10 @@ void bacatext(const char *filename) {//program untuk membaca file "txt"
     if (fp == NULL) {//jika file tidak ada print yg dibawah ini, dan TIDAK MEMBUAT FILE, karena hanya mode w yang dapat membuat file
         printf("File tidak ditemukan");
     } else {
-        while (fgets(isi, sizeof(isi), fp) != NULL) {//menulis isi dari file "txt" ke dalam message
-            message[strcspn(message, "\n")] = 0;
-            
+       message[0] = '\0';  // Inisialisasi message agar kosong
+        char line[1000];
+        while (fgets(line, sizeof(line), fp) != NULL) {
+            strcat(message, line);  // Gabungkan setiap baris dengan message
         }
     }
     //printf("%s",message);
